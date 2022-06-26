@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  web:
+    environment:
+      - NAME
+    build:
+      context: .
+      dockerfile: Django.Dockerfile
+    command: /code/start_app.sh ${NAME}
+    volumes:
+      - ./app:/code
+    networks:
+      - backend
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_NAME=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      - db
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    networks:
+      - backend
+
+networks:
+  backend:
+    name: ${NAME}-api
+
